@@ -19,6 +19,7 @@ beforeEach(() => {
         .expect(200)
         .then((res) => {
             expect(res.body.category.length).toBe(4);
+            expect(Object.keys(res.body.category[0])).toEqual(['slug', 'description'])
           });
     })
   });
