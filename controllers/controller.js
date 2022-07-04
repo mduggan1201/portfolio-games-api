@@ -1,4 +1,3 @@
-const req = require('express/lib/request')
 const { selectCategories, selectReviewById } = require('../models/model')
 
 exports.getCategories = (req,res) => {
