@@ -154,8 +154,8 @@ describe('GET /api/users', () => {
       .get('/api/users')
       .expect(200)
       .then((res) => {
-          expect(res.body.user.length).toBe(4);
-          expect(Object.keys(res.body.user[0])).toEqual(['username', 'name', 'avatar_url'])
+          expect(res.body.users.length).toBe(4);
+          expect(Object.keys(res.body.users[0])).toEqual(['username', 'name', 'avatar_url'])
         });
   })
 });

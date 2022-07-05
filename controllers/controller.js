@@ -4,6 +4,7 @@ exports.getCategories = (req,res) => {
     selectCategories().then((category) => {
         res.status(200).send({ category })
     })
+    .catch(next)
 }
 
 exports.getReviewById = (req,res, next) => {
@@ -24,7 +25,8 @@ exports.patchReviewById = (req, res, next) => {
 }
 
 exports.getUsers = (req,res) => {
-    selectUsers().then((user) => {
-        res.status(200).send({ user })
+    selectUsers().then((users) => {
+        res.status(200).send({ users })
     })
+    .catch(next)
 }
