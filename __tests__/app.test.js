@@ -134,3 +134,16 @@ describe('PATCH /api/review/:review_id', () => {
       })
   })
 })
+
+describe('PATCH /api/review/:review_id', () => {
+  it('responds with an error when the request body is incorrect', () => {
+    const reviewUpdates = {"inc votes": 100}
+      return request(app)
+      .patch('/api/reviews/1')
+      .send(reviewUpdates)
+      .expect(400)
+      .then((res) => {
+        expect(res.body).toEqual({"msg": 'Invalid Request Body. There has been no update.'})
+      })
+  })
+})

@@ -26,6 +26,10 @@ exports.selectReviewById = (review_Id) => {
 }
 
 exports.updateReviewByID = (review_Id, updateReview) => {
+    if(!Object.keys(updateReview).includes('inc_votes')){
+    return Promise.reject({status: 400, msg: 'Invalid Request Body. There has been no update.'})
+    }
+
     const { inc_votes } = updateReview;
 
     if(!/^[0-9]*$/.test(review_Id)) {
