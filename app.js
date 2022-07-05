@@ -1,19 +1,18 @@
 const express = require('express');
 const app = express()
-const { getCategories, getReviewById, patchReviewById } = require('./controllers/controller');
+const { getCategories, getReviewById } = require('./controllers/controller');
 
 app.use(express.json())
 
 app.get('/api/categories', getCategories)
 app.get('/api/reviews/:review_Id', getReviewById)
 
-app.patch('/api/reviews/:review_Id', patchReviewById)
 
 app.use((err,req,res,next) => {
   if(err.status && err.msg) {
     res.status(err.status).send({msg: err.msg})
   } else {
-    res.status(500).send({{msg: 'Internal Server Error'})
+    res.status(500).send({msg: 'Internal Server Error'})
   }
 })
 
