@@ -11,6 +11,5 @@ exports.getReviewById = (req,res, next) => {
     selectReviewById(review_Id).then((review) => {
         res.status(200).send({ review })
     })
-    .catch(next)
-    
+    .catch(next) 
 }

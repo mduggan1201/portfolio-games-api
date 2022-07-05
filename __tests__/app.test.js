@@ -57,3 +57,15 @@ describe('GET /api/review/:review_id', () => {
       })
   })
 })
+
+
+describe('GET /api/review/:review_id', () => {
+  it('responds with an error when the review is not a number', () => {
+      return request(app)
+      .get('/api/reviews/banana')
+      .expect(400)
+      .then((res) => {
+          expect(res.body).toEqual({"msg":"ID entered is not a number"})
+      })
+  })
+})

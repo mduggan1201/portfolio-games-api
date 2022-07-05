@@ -6,6 +6,10 @@ exports.selectCategories = () => {
 }
 
 exports.selectReviewById = (review_Id) => {
+
+    if(!/^[0-9]*$/.test(review_Id)) {
+        return Promise.reject({status: 400, msg: 'ID entered is not a number'})
+    }
     return db
         .query('SELECT * FROM reviews where review_id = $1;', [review_Id])
         .then(({ rows }) => {
@@ -18,4 +22,5 @@ exports.selectReviewById = (review_Id) => {
             }
             return review
         })
+        
 }
