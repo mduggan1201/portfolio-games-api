@@ -57,3 +57,8 @@ exports.updateReviewByID = (review_Id, updateReview) => {
         })
 
 }
+
+exports.selectUsers = () => {
+    return db.query('SELECT * FROM users;')
+        .then((result) => result.rows)
+}

@@ -147,3 +147,15 @@ describe('PATCH /api/review/:review_id', () => {
       })
   })
 })
+
+describe('GET /api/users', () => {
+  it('responds with object with key of users and array of objects showing username, name and avatarurl', () => {
+      return request(app)
+      .get('/api/users')
+      .expect(200)
+      .then((res) => {
+          expect(res.body.user.length).toBe(4);
+          expect(Object.keys(res.body.user[0])).toEqual(['username', 'name', 'avatar_url'])
+        });
+  })
+});
