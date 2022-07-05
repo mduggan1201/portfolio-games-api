@@ -41,7 +41,7 @@ describe('GET /api/reviews/:review_id', () => {
         .get('/api/reviews/1')
         .expect(200)
         .then((res) => {
-            expect(Object.keys(res.body.review)).toEqual(['review_id', 'title','category','designer','owner','review_body','review_img_url','created_at','votes'])
+            expect(Object.keys(res.body.review)).toEqual(['review_id', 'title','category','designer','owner','review_body','review_img_url','created_at','votes','comment_count'])
             expect(res.body.review["review_id"]).toBe(1)
           });
     })
@@ -156,6 +156,32 @@ describe('GET /api/users', () => {
       .then((res) => {
           expect(res.body.users.length).toBe(4);
           expect(Object.keys(res.body.users[0])).toEqual(['username', 'name', 'avatar_url'])
+        });
+  })
+});
+
+describe('GET /api/reviews/:review_id', () => {
+  it('responds with the specified review assiocated data, and aggregated comment count. Review ID 2 is used as this has comments assiocated with it.', () => {
+      return request(app)
+      .get('/api/reviews/2')
+      .expect(200)
+      .then((res) => {
+          expect(Object.keys(res.body.review)).toEqual(['review_id', 'title','category','designer','owner','review_body','review_img_url','created_at','votes','comment_count'])
+          expect(res.body.review["review_id"]).toBe(2)
+          expect(res.body.review["comment_count"]).toBe(3)
+        });
+  })
+});
+
+describe('GET /api/reviews/:review_id', () => {
+  it('responds with the specified review assiocated data, and aggregated comment count, returning 0 if there are no comments linked', () => {
+      return request(app)
+      .get('/api/reviews/1')
+      .expect(200)
+      .then((res) => {
+          expect(Object.keys(res.body.review)).toEqual(['review_id', 'title','category','designer','owner','review_body','review_img_url','created_at','votes','comment_count'])
+          expect(res.body.review["review_id"]).toBe(1)
+          expect(res.body.review["comment_count"]).toBe(0)
         });
   })
 });
