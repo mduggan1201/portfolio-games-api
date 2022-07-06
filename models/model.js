@@ -31,7 +31,6 @@ exports.selectReviewById = (review_Id) => {
         
 }
 
-
 exports.updateReviewByID = (review_Id, updateReview) => {
     if(!Object.keys(updateReview).includes('inc_votes')){
     return Promise.reject({status: 400, msg: 'Invalid Request Body. There has been no update.'})
@@ -67,5 +66,16 @@ exports.updateReviewByID = (review_Id, updateReview) => {
 
 exports.selectUsers = () => {
     return db.query('SELECT * FROM users;')
+        .then((result) => result.rows)
+}
+
+exports.selectReviews = () => {
+    return db.query(`
+    SELECT reviews.*, CAST(COUNT(comment_Id) as int) as comment_count
+    FROM reviews
+    LEFT JOIN comments ON reviews.review_id = comments.review_id
+    GROUP BY reviews.review_id
+    ORDER BY created_at desc;
+    `)
         .then((result) => result.rows)
 }

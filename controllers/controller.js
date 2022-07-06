@@ -1,4 +1,4 @@
-const { selectCategories, selectReviewById, updateReviewByID, selectUsers } = require('../models/model')
+const { selectCategories, selectReviewById, updateReviewByID, selectUsers, selectReviews } = require('../models/model')
 
 exports.getCategories = (req,res, next) => {
     selectCategories().then((category) => {
@@ -27,6 +27,13 @@ exports.patchReviewById = (req, res, next) => {
 exports.getUsers = (req,res, next) => {
     selectUsers().then((users) => {
         res.status(200).send({ users })
+    })
+    .catch(next)
+}
+
+exports.getReviews = (req,res,next) => {
+    selectReviews().then((reviews) => {
+        res.status(200).send({ reviews })
     })
     .catch(next)
 }
