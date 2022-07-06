@@ -32,11 +32,22 @@ exports.getUsers = (req,res, next) => {
 }
 
 exports.getReviews = (req,res,next) => {
-    selectReviews().then((reviews) => {
+    const validQueryParams = ['sort_by', 'order', 'category']
+    const QueryParams = Object.keys(req.query)
+
+    for(let i = 0; i < QueryParams.length; i++){
+        if(!validQueryParams.includes(QueryParams[i])){
+            return Promise.reject( "Invalid Query Parameters")
+            .catch(next)
+        }
+    }
+    const { sort_by, order, category }  = req.query
+    selectReviews(sort_by, order, category).then((reviews) => {
         res.status(200).send({ reviews })
     })
     .catch(next)
 }
+
 exports.getCommentsByReviewId = (req,res,next) => {
     const { review_Id }  = req.params 
     selectCommentsByReviewId(review_Id).then((comments) => {
