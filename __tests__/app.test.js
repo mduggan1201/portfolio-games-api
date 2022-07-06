@@ -197,3 +197,29 @@ describe('GET /api/reviews', () => {
         });
   })
 });
+
+
+describe('GET GET /api/reviews/:review_id/comments', () => {
+  it('responds with the comments associated with the review_id', () => {
+      return request(app)
+      .get('/api/reviews/2/comments')
+      .expect(200)
+      .then((res) => {
+          expect(Object.keys(res.body.comments[0])).toEqual(['comment_id', 'body','review_id','author','votes','created_at'])
+          expect(res.body.comments.length).toBe(3)
+        });
+  })
+});
+
+describe('GET /api/reviews/:review_id/comments', () => {
+  it('responds with an error review has no comments ', () => {
+    const reviewUpdates = {"inc votes": 100}
+      return request(app)
+      .get('/api/reviews/1/comments')
+      .expect(404)
+      .then((res) => {
+        expect(res.body).toEqual({"msg": 'No comments found for review_id: 1'})
+      })
+  })
+})
+

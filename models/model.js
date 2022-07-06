@@ -79,3 +79,25 @@ exports.selectReviews = () => {
     `)
         .then((result) => result.rows)
 }
+
+exports.selectCommentsByReviewId = (review_Id) => {
+    if(!/^[0-9]*$/.test(review_Id)) {
+        return Promise.reject({status: 400, msg: 'ID entered is not a number'})
+    }
+    return db
+        .query(`SELECT comments.*
+        FROM comments
+        where review_id = $1;
+        `, [review_Id])
+        .then(({ rows }) => {
+            const comments = rows
+            if(comments.length === 0){
+                return Promise.reject({
+                    status: 404,
+                    msg: `No comments found for review_id: ${review_Id}`
+                })
+            }
+            return comments
+        })
+}
+
