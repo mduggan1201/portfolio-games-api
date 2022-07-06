@@ -223,3 +223,53 @@ describe('GET /api/reviews/:review_id/comments', () => {
   })
 })
 
+describe('POST /api/reviews/:review_id/comments', () => {
+  it('responds with an object of the newly added comment', () => {
+      const newComment = {
+        "author": "mallionaire",
+        "body": "testbody"
+      }
+      return request(app)
+      .post('/api/reviews/2/comments')
+      .send(newComment)
+      .expect(201)
+      .then((res) => {
+        expect(Object.keys(res.body.comment[0])).toEqual(['comment_id', 'body','review_id','author','votes','created_at'])
+        expect(res.body.comment[0]["comment_id"]).toBe(7)
+        expect(res.body.comment[0]["author"]).toBe(newComment["author"])
+        expect(res.body.comment[0]["body"]).toBe(newComment["body"])
+      })
+  })
+})
+
+describe('POST /api/reviews/:review_id/comments', () => {
+  it('responds with an error message for a user input not in the database', () => {
+      const newComment = {
+        "author": "TEST",
+        "body": "testbody"
+      }
+      return request(app)
+      .post('/api/reviews/2/comments')
+      .send(newComment)
+      .expect(404)
+      .then((res) => {
+        expect(res.body).toEqual({"msg": 'TEST is not in the users database. No data has been added.'})
+      })
+  })
+})
+
+describe('POST /api/reviews/:review_id/comments', () => {
+  it('responds with an error message for an empty body input', () => {
+      const newComment = {
+        "author": "TEST",
+        "body": ""
+      }
+      return request(app)
+      .post('/api/reviews/2/comments')
+      .send(newComment)
+      .expect(400)
+      .then((res) => {
+        expect(res.body).toEqual({"msg": 'Comment body cannot be empty. No data has been added.'})
+      })
+  })
+})

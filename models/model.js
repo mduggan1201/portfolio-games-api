@@ -101,3 +101,25 @@ exports.selectCommentsByReviewId = (review_Id) => {
         })
 }
 
+exports.insertComment = (review_Id, newComment) => {
+    const {author, body } = newComment;
+    if(body.length === 0) {
+        return Promise.reject({status: 400, msg: 'Comment body cannot be empty. No data has been added.'})
+    }
+    return db
+    .query('SELECT username FROM users WHERE username = $1;'
+    , [author])
+    .then(({ rows }) => {
+        const username = rows
+        if(username.length === 0){
+            return Promise.reject({
+                status: 404,
+                msg: `${author} is not in the users database. No data has been added.`
+            })
+        }
+        return db
+        .query(`INSERT INTO comments (author, body, review_id) VALUES ($1, $2, $3) RETURNING *;`,
+        [author, body, review_Id])
+        .then ((result) => result.rows)
+    })
+}
