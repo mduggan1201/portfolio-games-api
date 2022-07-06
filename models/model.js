@@ -101,3 +101,40 @@ exports.selectCommentsByReviewId = (review_Id) => {
         })
 }
 
+exports.insertComment = (review_Id, newComment) => {
+    const {author, body } = newComment;
+    if(!/^[0-9]*$/.test(review_Id)) {
+        return Promise.reject({status: 400, msg: 'ID entered is not a number.'})
+    }
+    if(body.length === 0) {
+        return Promise.reject({status: 400, msg: 'Comment body cannot be empty. No data has been added.'})
+    }
+
+    return db
+    .query('SELECT review_id FROM reviews WHERE review_id = $1;', [review_Id])
+    .then(({ rows }) => {
+        const review = rows
+        if(review.length === 0){
+            return Promise.reject({
+                status: 404,
+                msg: `${review_Id} is not within the database. No data has been added.`
+            })
+        }
+        return db
+        .query('SELECT username FROM users WHERE username = $1;'
+        , [author])
+        .then(({ rows }) => {
+            const username = rows
+            if(username.length === 0){
+                return Promise.reject({
+                    status: 404,
+                    msg: `${author} is not in the users database. No data has been added.`
+                })
+            }
+            return db
+            .query(`INSERT INTO comments (author, body, review_id) VALUES ($1, $2, $3) RETURNING *;`,
+            [author, body, review_Id])
+            .then ((result) => result.rows)
+        })
+    })
+}
