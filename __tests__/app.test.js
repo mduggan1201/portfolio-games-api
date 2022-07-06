@@ -273,3 +273,35 @@ describe('POST /api/reviews/:review_id/comments', () => {
       })
   })
 })
+
+describe('POST /api/reviews/:review_id/comments', () => {
+  it('responds with an error message for an empty body input', () => {
+    const newComment = {
+      "author": "mallionaire",
+      "body": "testbody"
+    }
+      return request(app)
+      .post('/api/reviews/2a/comments')
+      .send(newComment)
+      .expect(400)
+      .then((res) => {
+        expect(res.body).toEqual({"msg": 'ID entered is not a number.'})
+      })
+  })
+})
+
+describe('POST /api/reviews/:review_id/comments', () => {
+  it('responds with an error message for an empty body input', () => {
+    const newComment = {
+      "author": "mallionaire",
+      "body": "testbody"
+    }
+      return request(app)
+      .post('/api/reviews/2222/comments')
+      .send(newComment)
+      .expect(404)
+      .then((res) => {
+        expect(res.body).toEqual({"msg": '2222 is not within the database. No data has been added.'})
+      })
+  })
+})
