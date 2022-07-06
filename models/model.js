@@ -1,4 +1,5 @@
 const db = require('../db/connection')
+const format = require('pg-format')
 
 exports.selectCategories = () => {
     return db.query('SELECT * FROM categories')
@@ -73,22 +74,21 @@ exports.selectReviews = (sort_by = 'created_at', order = 'desc', category) => {
 
     const validSortOpitons = ['review_id','title','category','designer','owner','review_body','review_img_url','created_at','votes','comment_count']
     const validOrderOptions = ['asc','desc']
-    const filterCategory = category.replace("_"," ")
-    
+
     if(!validSortOpitons.includes(sort_by)){
-        return Promise.reject( "Invalid Sort By Query" )
+        return Promise.reject({status: 400, msg: "Invalid Sort By Query" })
     }
 
     if(!validOrderOptions.includes(order)){
-        return Promise.reject("Invalid Order By Query")
+        return Promise.reject({status: 400, msg: "Invalid Order By Query"})
     }
     
     const queryValues =[];
     let queryStr = `SELECT reviews.*, CAST(COUNT(comment_Id) as int) as comment_count
     FROM reviews
     LEFT JOIN comments ON reviews.review_id = comments.review_id`
-    if(filterCategory !== undefined) {
-        queryValues.push(filterCategory)
+    if(category !== undefined) {
+        queryValues.push(category.replace("_"," "))
         queryStr += ` WHERE category in (%L)`
     }
     queryStr += ` GROUP BY reviews.review_id
@@ -102,7 +102,7 @@ exports.selectReviews = (sort_by = 'created_at', order = 'desc', category) => {
         if(reviews.length === 0){
             return Promise.reject({
                 status: 404,
-                msg: `No reviews found for category: ${filterCategory}`
+                msg: `No reviews found for category: ${category}`
             })
         }
         return reviews

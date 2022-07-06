@@ -199,7 +199,7 @@ describe('GET /api/reviews', () => {
 });
 
 
-describe('GET GET /api/reviews/:review_id/comments', () => {
+describe('GET /api/reviews/:review_id/comments', () => {
   it('responds with the comments associated with the review_id', () => {
       return request(app)
       .get('/api/reviews/2/comments')
@@ -302,6 +302,77 @@ describe('POST /api/reviews/:review_id/comments', () => {
       .expect(404)
       .then((res) => {
         expect(res.body).toEqual({"msg": '2222 is not within the database. No data has been added.'})
+      })
+  })
+})
+
+describe('GET /api/reviews sort_by order and category', () => {
+  it('responds with an object containing all reviews, sorted by query parameters', () => {
+      return request(app)
+      .get('/api/reviews?sort_by=title')
+      .expect(200)
+      .then((res) => {
+          expect(Object.keys(res.body.reviews[0])).toEqual(['review_id', 'title','category','designer','owner','review_body','review_img_url','created_at','votes','comment_count'])
+          expect(res.body.reviews).toBeSorted({key: "title", descending: true})
+        });
+  })
+});
+
+describe('GET /api/reviews sort_by order and category', () => {
+  it('responds with an object containing all reviews, sorted by query parameters', () => {
+      return request(app)
+      .get('/api/reviews?sort_by=title&order=asc')
+      .expect(200)
+      .then((res) => {
+          expect(Object.keys(res.body.reviews[0])).toEqual(['review_id', 'title','category','designer','owner','review_body','review_img_url','created_at','votes','comment_count'])
+          expect(res.body.reviews).toBeSorted({key: "title"})
+        });
+  })
+});
+
+describe('GET /api/reviews sort_by order and category', () => {
+  it('responds with an object containing all reviews, sorted by query parameters, filtered by euro games ', () => {
+      return request(app)
+      .get('/api/reviews?sort_by=title&order=asc&category=euro_game')
+      .expect(200)
+      .then((res) => {
+          expect(Object.keys(res.body.reviews[0])).toEqual(['review_id', 'title','category','designer','owner','review_body','review_img_url','created_at','votes','comment_count'])
+          expect(res.body.reviews).toBeSorted({key: "title"})
+          expect(res.body.reviews.length).toBe(1)
+          expect(res.body.reviews[0]["category"]).toBe("euro game")
+        });
+  })
+});
+
+describe('GET /api/reviews error handling for sort by', () => {
+  it('responds with a message showing incorrect sort by query ', () => {
+      return request(app)
+      .get('/api/reviews?sort_by=invalidchoice')
+      .expect(400)
+      .then((res) => {
+        expect(res.body).toEqual({"msg": 'Invalid Sort By Query'})
+      })
+  })
+})
+
+describe('GET /api/reviews error handling for order by', () => {
+  it('responds with a message showing incorrect order by query ', () => {
+      return request(app)
+      .get('/api/reviews?order=invalidchoice')
+      .expect(400)
+      .then((res) => {
+        expect(res.body).toEqual({"msg": 'Invalid Order By Query'})
+      })
+  })
+})
+
+describe('GET /api/reviews error handling for order by', () => {
+  it('responds with a message showing incorrect order by query ', () => {
+      return request(app)
+      .get('/api/reviews?category=invalidchoice')
+      .expect(404)
+      .then((res) => {
+        expect(res.body).toEqual({"msg": "No reviews found for category: invalidchoice"})
       })
   })
 })
