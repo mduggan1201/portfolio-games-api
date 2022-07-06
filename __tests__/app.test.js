@@ -3,6 +3,7 @@ const testData = require('../db/data/test-data');
 const db = require('../db/connection');
 const app = require('../app')
 const request = require('supertest')
+const toBeSorted = require('jest-sorted')
 
 beforeEach(() => {
     return seed(testData)
@@ -57,7 +58,6 @@ describe('GET /api/review/:review_id', () => {
       })
   })
 })
-
 
 describe('GET /api/review/:review_id', () => {
   it('responds with an error when the review is not a number', () => {
@@ -182,6 +182,18 @@ describe('GET /api/reviews/:review_id', () => {
           expect(Object.keys(res.body.review)).toEqual(['review_id', 'title','category','designer','owner','review_body','review_img_url','created_at','votes','comment_count'])
           expect(res.body.review["review_id"]).toBe(1)
           expect(res.body.review["comment_count"]).toBe(0)
+        });
+  })
+});
+
+describe('GET /api/reviews', () => {
+  it('responds with an object containing all reviews, sorted by created date in descending order', () => {
+      return request(app)
+      .get('/api/reviews')
+      .expect(200)
+      .then((res) => {
+          expect(Object.keys(res.body.reviews[0])).toEqual(['review_id', 'title','category','designer','owner','review_body','review_img_url','created_at','votes','comment_count'])
+          expect(res.body.reviews).toBeSorted({key: "created_at", descending: true})
         });
   })
 });
