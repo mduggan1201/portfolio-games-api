@@ -11,7 +11,13 @@ exports.selectReviewById = (review_Id) => {
         return Promise.reject({status: 400, msg: 'ID entered is not a number'})
     }
     return db
-        .query('SELECT * FROM reviews where review_id = $1;', [review_Id])
+        .query(`
+        SELECT reviews.*, CAST(COUNT(comment_Id) as int) as comment_count
+        FROM reviews
+        LEFT JOIN comments ON reviews.review_id = comments.review_id
+        where reviews.review_id = $1
+        GROUP BY reviews.review_id;
+        `, [review_Id])
         .then(({ rows }) => {
             const review = rows[0]
             if(!review){
@@ -24,6 +30,7 @@ exports.selectReviewById = (review_Id) => {
         })
         
 }
+
 
 exports.updateReviewByID = (review_Id, updateReview) => {
     if(!Object.keys(updateReview).includes('inc_votes')){
