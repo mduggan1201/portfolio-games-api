@@ -376,3 +376,33 @@ describe('GET /api/reviews error handling for order by', () => {
       })
   })
 })
+
+describe('DELETE /api/comments/:comment_id deletes a comment', () => {
+  it('responds with a 204 message showing ', () => {
+      return request(app)
+      .delete('/api/comments/5')
+      .expect(204)
+  })
+})
+
+describe('DELETE /api/comments/:comment_id error handling', () => {
+  it('responds with a 400 message showing the ID entered is not in the database', () => {
+      return request(app)
+      .delete('/api/comments/512345')
+      .expect(404)
+      .then((res) => {
+        expect(res.body).toEqual({"msg": "512345 is not in the comments database. No data has been removed."})
+      })
+  })
+})
+
+describe('DELETE /api/comments/:comment_id error handling', () => {
+  it('responds with a 400 message showing the ID entered is not in the database', () => {
+      return request(app)
+      .delete('/api/comments/5a')
+      .expect(400)
+      .then((res) => {
+        expect(res.body).toEqual({"msg": "ID entered is not a number. No data has been removed"})
+      })
+  })
+})

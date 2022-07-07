@@ -168,3 +168,25 @@ exports.insertComment = (review_Id, newComment) => {
         })
     })
 }
+
+exports.removeCommentById = (removeComment) => {
+    const { comment_id } = removeComment
+    if(!/^[0-9]*$/.test(comment_id)) {
+        return Promise.reject({status: 400, msg: 'ID entered is not a number. No data has been removed'})
+    }
+    return db
+    .query(
+        `DELETE FROM comments WHERE comment_id = $1 RETURNING *;`,
+        [comment_id]
+    )
+    .then(({ rows }) => {
+        const delComment = rows
+        if(delComment.length === 0){
+            return Promise.reject({
+                status: 404,
+                msg: `${comment_id} is not in the comments database. No data has been removed.`
+            })
+        }
+        return delComment
+    })
+}
