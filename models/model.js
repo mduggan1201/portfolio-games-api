@@ -1,4 +1,6 @@
 const db = require('../db/connection')
+const format = require('pg-format')
+const fs = require('fs/promises')
 
 exports.selectCategories = () => {
     return db.query('SELECT * FROM categories')
@@ -69,16 +71,45 @@ exports.selectUsers = () => {
         .then((result) => result.rows)
 }
 
-exports.selectReviews = () => {
-    return db.query(`
-    SELECT reviews.*, CAST(COUNT(comment_Id) as int) as comment_count
+exports.selectReviews = (sort_by = 'created_at', order = 'desc', category) => {
+
+    const validSortOpitons = ['review_id','title','category','designer','owner','review_body','review_img_url','created_at','votes','comment_count']
+    const validOrderOptions = ['asc','desc']
+
+    if(!validSortOpitons.includes(sort_by)){
+        return Promise.reject({status: 400, msg: "Invalid Sort By Query" })
+    }
+
+    if(!validOrderOptions.includes(order)){
+        return Promise.reject({status: 400, msg: "Invalid Order By Query"})
+    }
+    
+    const queryValues =[];
+    let queryStr = `SELECT reviews.*, CAST(COUNT(comment_Id) as int) as comment_count
     FROM reviews
-    LEFT JOIN comments ON reviews.review_id = comments.review_id
-    GROUP BY reviews.review_id
-    ORDER BY created_at desc;
-    `)
-        .then((result) => result.rows)
+    LEFT JOIN comments ON reviews.review_id = comments.review_id`
+    if(category !== undefined) {
+        queryValues.push(category.replace("_"," "))
+        queryStr += ` WHERE category in (%L)`
+    }
+    queryStr += ` GROUP BY reviews.review_id
+    ORDER BY ${sort_by} ${order};`
+
+    const reviewQuery = format(queryStr, queryValues)
+    return db
+    .query(reviewQuery)
+    .then(({ rows }) => {
+        const reviews = rows
+        if(reviews.length === 0){
+            return Promise.reject({
+                status: 404,
+                msg: `No reviews found for category: ${category}`
+            })
+        }
+        return reviews
+    })
 }
+
 
 exports.selectCommentsByReviewId = (review_Id) => {
     if(!/^[0-9]*$/.test(review_Id)) {
@@ -137,4 +168,34 @@ exports.insertComment = (review_Id, newComment) => {
             .then ((result) => result.rows)
         })
     })
+}
+
+exports.removeCommentById = (removeComment) => {
+    const { comment_id } = removeComment
+    if(!/^[0-9]*$/.test(comment_id)) {
+        return Promise.reject({status: 400, msg: 'ID entered is not a number. No data has been removed'})
+    }
+    return db
+    .query(
+        `DELETE FROM comments WHERE comment_id = $1 RETURNING *;`,
+        [comment_id]
+    )
+    .then(({ rows }) => {
+        const delComment = rows
+        if(delComment.length === 0){
+            return Promise.reject({
+                status: 404,
+                msg: `${comment_id} is not in the comments database. No data has been removed.`
+            })
+        }
+        return delComment
+    })
+}
+
+exports.selectApi = () => {
+    return fs.readFile(`${__dirname}/../endpoints.json`,'utf-8')
+        .then((endpoint) => {
+            const endpoints = JSON.parse(endpoint)
+            return endpoints
+        })
 }
