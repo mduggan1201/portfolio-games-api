@@ -8,7 +8,9 @@
     "seed": "node ./db/seeds/run-seed.js",
     "test": "npm run setup-dbs && npm run seed && jest",
     "prepare": "husky install",
-    "dev": "npm run setup-dbs && npm run seed && nodemon listen.js"
+    "dev": "npm run setup-dbs && npm run seed && nodemon listen.js",
+    "seed:prod": "NODE_ENV=production DATABASE_URL=$(heroku config:get DATABASE_URL) npm run seed",
+    "start": "node listen.js"
   },
   "repository": {
     "type": "git",
@@ -27,13 +29,12 @@
     "jest": "^27.5.1",
     "jest-extended": "^2.0.0",
     "nodemon": "^2.0.18",
-    "pg": "^8.7.3",
     "pg-format": "^1.0.4",
     "supertest": "^6.2.4"
   },
   "devDependencies": {
     "dotenv": "^16.0.1",
-    "pg": "^8.7.3"
+    "pg": "^8.8.0"
   },
   "jest": {
     "setupFilesAfterEnv": [
