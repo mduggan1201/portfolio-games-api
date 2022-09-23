@@ -1,5 +1,6 @@
 const db = require('../db/connection')
 const format = require('pg-format')
+const fs = require('fs/promises')
 
 exports.selectCategories = () => {
     return db.query('SELECT * FROM categories')
@@ -189,4 +190,12 @@ exports.removeCommentById = (removeComment) => {
         }
         return delComment
     })
+}
+
+exports.selectApi = () => {
+    return fs.readFile(`${__dirname}/../endpoints.json`,'utf-8')
+        .then((endpoint) => {
+            const endpoints = JSON.parse(endpoint)
+            return endpoints
+        })
 }
