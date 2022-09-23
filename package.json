@@ -42,5 +42,6 @@
     "setupFilesAfterEnv": [
       "jest-extended/all"
     ]
-  }
+  },
+  "heroku-run-build-script": true
 }
