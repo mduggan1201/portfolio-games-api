@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express()
 const { getCategories, getReviewById, patchReviewById, getUsers, getReviews, getCommentsByReviewId, postComment, deleteComment, getAPI } = require('./controllers/controller');
+const cors = require('cors')
 
 app.use(express.json())
 
@@ -16,6 +17,8 @@ app.patch('/api/reviews/:review_Id', patchReviewById)
 app.post('/api/reviews/:review_Id/comments', postComment)
 
 app.delete('/api/comments/:comment_id', deleteComment)
+
+app.use(cors());
 
 app.use((err,req,res,next) => {
   if(err.status && err.msg) {
